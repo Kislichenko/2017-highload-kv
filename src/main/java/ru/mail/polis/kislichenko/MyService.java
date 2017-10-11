@@ -7,6 +7,7 @@ import ru.mail.polis.KVService;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.NoSuchElementException;
 
 public class MyService implements KVService {
     private static final String PREFIX = "id=";
@@ -14,22 +15,32 @@ public class MyService implements KVService {
     @NotNull
     private final HttpServer server;
     @NotNull
-    private final MyDAO dao;
+    private final MyFileDAO dao;
 
-    public MyService(int port, @NotNull final MyDAO dao) throws IOException {
+    public MyService(int port, @NotNull final MyFileDAO dao) throws IOException {
 
         this.server = HttpServer.create(new InetSocketAddress(port),0);
-
-        this.dao=dao;
+        this.dao = dao;
 
         this.server.createContext("/v0/status", this::statusContextHandle);
         this.server.createContext("/v0/entity", this::entityContextHandle);
     }
 
     private void entityContextHandle(@NotNull HttpExchange http) throws IOException{
-        final String id = extractId(http.getRequestURI().getQuery());
+        final String id;
 
-        if(emptyId(http,id)) return;
+        try {
+              id = extractId(http.getRequestURI().getQuery());
+        }catch(IllegalArgumentException e){
+            http.sendResponseHeaders(404, 0);
+            http.close();
+            return;
+        }
+
+        if(id.isEmpty()) {
+            requestWithEmptyId(http);
+            return;
+        }
 
         switch (http.getRequestMethod()) {
             case "GET":
@@ -45,25 +56,28 @@ public class MyService implements KVService {
                 break;
 
             default:
-                http.sendResponseHeaders(405, 0);
+                requestDefault(http, id);
+                break;
         }
 
         http.close();
     }
 
     private void statusContextHandle(HttpExchange http) throws IOException{
-        final String response ="ONLINE";
+        final String response = "ONLINE";
+
         http.sendResponseHeaders(200, response.length());
         http.getResponseBody().write(response.getBytes());
+
         http.close();
     }
+
 
     @NotNull
     private static String extractId(@NotNull final String query){
         if(!query.startsWith(PREFIX)){
-            throw  new IllegalArgumentException("Shitty string");
+            throw  new IllegalArgumentException("Query without correct PREFIX!");
         }
-
         return  query.substring(PREFIX.length());
     }
 
@@ -74,9 +88,14 @@ public class MyService implements KVService {
             http.sendResponseHeaders(200, getValue.length);
             http.getResponseBody().write(getValue);
 
-        } catch (IOException e){
+        }catch (NoSuchElementException e){
             http.sendResponseHeaders(404, 0);
         }
+
+    }
+
+    private void requestDefault(@NotNull HttpExchange http, String id) throws  IOException{
+        http.sendResponseHeaders(405, 0);
     }
 
     private void requestDelete(@NotNull HttpExchange http, String id) throws IOException{
@@ -86,26 +105,22 @@ public class MyService implements KVService {
 
     private void requestPut(@NotNull HttpExchange http, String id) throws IOException{
 
-        final int contentLength =
-                Integer.valueOf(http.getRequestHeaders().getFirst("Content-Length"));
+        String ctLength = http.getRequestHeaders().getFirst("Content-Length");
 
-        final byte[] putValue = new byte[contentLength];
+        int contentLength = 0;
 
-        if (contentLength>0&&http.getRequestBody().read(putValue) != putValue.length) {
-            throw new IOException("Can't read at once");
-        }
+        //если "Content-Length" не был отправлен в запросе, то по дефолту принимаем тело равным 0
+        if(ctLength != null) contentLength =  Integer.valueOf(ctLength);
 
-        dao.upsert(id, putValue);
+        FileReading readFile = new FileReading(http.getRequestBody(),contentLength);
+
+        dao.upsert(id, readFile.getFindByteArray());
         http.sendResponseHeaders(201, 0);
     }
 
-    private boolean emptyId(@NotNull HttpExchange http, String id) throws IOException{
-        if(id.isEmpty()) {
-            http.sendResponseHeaders(400, 0);
-            http.close();
-            return true;
-        }
-        return false;
+    private void requestWithEmptyId(@NotNull HttpExchange http) throws IOException{
+        http.sendResponseHeaders(400, 0);
+        http.close();
     }
 
     @Override
