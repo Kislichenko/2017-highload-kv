@@ -1,6 +1,5 @@
 package ru.mail.polis.kislichenko;
 
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
