@@ -99,6 +99,7 @@ public class SingleNodeTest extends TestBase {
         final HttpResponse response = get(key);
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertArrayEquals(value, payloadOf(response));
+
     }
 
     @Test
