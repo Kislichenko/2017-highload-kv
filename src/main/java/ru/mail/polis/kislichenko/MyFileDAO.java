@@ -51,7 +51,6 @@ public class MyFileDAO implements MyDAO {
         getFile(key).delete();
     }
 
-
     private long getFreeMemory() {
         return Runtime.getRuntime().maxMemory()
                 - (Runtime.getRuntime().totalMemory()
@@ -62,10 +61,10 @@ public class MyFileDAO implements MyDAO {
     private int getSizeFromFreeMemory(File file) {
         if (file.length() > Integer.MAX_VALUE) {
             if (file.length() < getFreeMemory() * 0.7) return Integer.MAX_VALUE;
-            else return (int) (getFreeMemory() * 0.7);
+            return (int) (getFreeMemory() * 0.7);
         } else {
             if (file.length() < getFreeMemory() * 0.7) return (int) file.length();
-            else return (int) (getFreeMemory() * 0.7);
+            return (int) (getFreeMemory() * 0.7);
         }
     }
 

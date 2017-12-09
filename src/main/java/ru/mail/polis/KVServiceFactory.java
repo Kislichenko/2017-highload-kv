@@ -1,6 +1,7 @@
 package ru.mail.polis;
 
 import org.jetbrains.annotations.NotNull;
+import ru.mail.polis.kislichenko.ClusterService;
 import ru.mail.polis.kislichenko.MyFileDAO;
 import ru.mail.polis.kislichenko.MyService;
 
@@ -49,6 +50,6 @@ final class KVServiceFactory {
             throw new IllegalArgumentException("Path is not a directory: " + data);
         }
 
-        return new MyService(port, new MyFileDAO(data));
+        return new ClusterService(port, new MyFileDAO(data), topology);
     }
 }

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class ThreeNodeTest extends ClusterTestBase {
     @Rule
-    public final Timeout globalTimeout = Timeout.seconds(3);
+    public final Timeout globalTimeout = Timeout.seconds(15);//было 3
     private int port0;
     private int port1;
     private int port2;
@@ -288,6 +288,7 @@ public class ThreeNodeTest extends ClusterTestBase {
         final byte[] value = randomValue();
 
         // Insert
+        System.out.println("Сгенерированный код: "+value.toString());
         assertEquals(201, upsert(0, key, value, 2, 2).getStatusLine().getStatusCode());
 
         int copies = 0;
@@ -303,6 +304,7 @@ public class ThreeNodeTest extends ClusterTestBase {
 
         // Check node 0
         if (get(0, key, 1, 1).getStatusLine().getStatusCode() == 200) {
+            System.out.println("0");
             copies++;
         }
 
@@ -315,6 +317,7 @@ public class ThreeNodeTest extends ClusterTestBase {
 
         // Check node 1
         if (get(1, key, 1, 1).getStatusLine().getStatusCode() == 200) {
+            System.out.println("1");
             copies++;
         }
 
@@ -327,6 +330,7 @@ public class ThreeNodeTest extends ClusterTestBase {
 
         // Check node 2
         if (get(2, key, 1, 1).getStatusLine().getStatusCode() == 200) {
+            System.out.println("2");
             copies++;
         }
 
