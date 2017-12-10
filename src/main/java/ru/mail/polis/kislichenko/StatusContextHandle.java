@@ -6,9 +6,10 @@ import java.io.IOException;
 
 public class StatusContextHandle {
 
-    private  final String response = "ONLINE";
+    private final String response = "ONLINE";
 
-    public StatusContextHandle(){}
+    public StatusContextHandle() {
+    }
 
     public void contextStatus(HttpExchange http) throws IOException {
 

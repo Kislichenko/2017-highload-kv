@@ -4,11 +4,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVService;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Set;
 
-public class ClusterService implements KVService{
+public class ClusterService implements KVService {
 
     @NotNull
     private final HttpServer server;
@@ -29,19 +30,19 @@ public class ClusterService implements KVService{
         this.server.createContext("/v0/status", this::statusContextHandle);
         this.server.createContext("/v0/entity", this::entityContextHandle);
 
-        this.ports=URLReader.getPorts(topology);
-        this.hosts=URLReader.getHosts(topology);
+        this.ports = URLReader.getPorts(topology);
+        this.hosts = URLReader.getHosts(topology);
 
-        this.myPort=port;
+        this.myPort = port;
     }
 
     private void entityContextHandle(@NotNull HttpExchange http) throws IOException {
-              EntityContextHandle entityContext = new EntityContextHandle(myPort, dao, ports, hosts);
-              entityContext.entityContextHandle(http);
+        EntityContextHandle entityContext = new EntityContextHandle(myPort, dao, ports, hosts);
+        entityContext.entityContextHandle(http);
     }
 
     private void statusContextHandle(HttpExchange http) throws IOException {
-        StatusContextHandle statusContext=new StatusContextHandle();
+        StatusContextHandle statusContext = new StatusContextHandle();
         statusContext.contextStatus(http);
     }
 
@@ -52,6 +53,6 @@ public class ClusterService implements KVService{
 
     @Override
     public void stop() {
-            this.server.stop(0);
+        this.server.stop(0);
     }
 }

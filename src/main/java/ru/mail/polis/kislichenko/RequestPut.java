@@ -18,10 +18,10 @@ public class RequestPut {
 
     public RequestPut(int port, @NotNull final MyFileDAO dao, int[] ports, String[] hosts) {
 
-        this.hosts=hosts;
-        this.ports=ports;
-        this.dao=dao;
-        this.myPort=port;
+        this.hosts = hosts;
+        this.ports = ports;
+        this.dao = dao;
+        this.myPort = port;
     }
 
     public void simplePut(@NotNull HttpExchange http, String id) throws IOException {
@@ -32,71 +32,73 @@ public class RequestPut {
     }
 
     public void topologyPut(@NotNull HttpExchange http, String id, int ack, int from) throws IOException {
-        int code=0;
-        int goodReplics=0;
-        byte[] myValue={};
+        int code = 0;
+        int goodReplics = 0;
+        byte[] myValue = {};
         final int contentLength = http.getRequestBody().available();
 
         myValue = new StreamReading(http.getRequestBody(), contentLength).getByteArray();
 
-        int checkIdPut=-1;
+        int checkIdPut = -1;
 
-        for (int i=0;i<hosts.length;i++){
+        for (int i = 0; i < hosts.length; i++) {
             if (ports[i] == myPort) {
-                if (dao.containsDeletedKey(id)||dao.checkId(id)) {
-                    checkIdPut=i;
+                if (dao.containsDeletedKey(id) || dao.checkId(id)) {
+                    checkIdPut = i;
                     break;
                 }
                 continue;
             }
-            try{
+            try {
                 int tmpCode = Request.Get(URLCreating.urlNodesIdPut(ports[i], id)).execute().
                         returnResponse().getStatusLine().getStatusCode();
 
-                if(tmpCode==404) continue;
-                else if(tmpCode==201){
-                    checkIdPut=i+1;
+                if (tmpCode == 404) continue;
+                else if (tmpCode == 201) {
+                    checkIdPut = i + 1;
                     break;
                 }
-            }catch (IOException e){
+            } catch (IOException e) {
                 continue;
             }
         }
 
-        boolean checkGoods=false;
+        boolean checkGoods = false;
 
-        if(checkIdPut==-1) checkIdPut=0;
-        else checkGoods=true;
+        if (checkIdPut == -1) checkIdPut = 0;
+        else checkGoods = true;
 
-        for(int i=checkIdPut;goodReplics<from&&i<hosts.length;i++) {
+        for (int i = checkIdPut; goodReplics < from && i < hosts.length; i++) {
 
             if (ports[i] == myPort) {
-                    if(dao.containsDeletedKey(id)||dao.checkId(id)||!checkGoods) dao.upsert(id, myValue);
-                    goodReplics++;
-                    continue;
+                if (dao.containsDeletedKey(id) || dao.checkId(id) || !checkGoods) dao.upsert(id, myValue);
+                goodReplics++;
+                continue;
             }
-                HttpResponse tmpStatus;
+            HttpResponse tmpStatus;
 
-                try {
-                    if(!checkGoods) tmpStatus = Request.Put(URLCreating.urlEntity(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
-                    else tmpStatus = Request.Put(URLCreating.urlNodesIdPut(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
-                } catch (IOException e) {
-                    continue;
-                }
+            try {
+                if (!checkGoods)
+                    tmpStatus = Request.Put(URLCreating.urlEntity(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
+                else
+                    tmpStatus = Request.Put(URLCreating.urlNodesIdPut(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
+            } catch (IOException e) {
+                continue;
+            }
 
-                code = tmpStatus.getStatusLine().getStatusCode();
+            code = tmpStatus.getStatusLine().getStatusCode();
 
-                if (code == 201) goodReplics++;
+            if (code == 201) goodReplics++;
         }
 
-        if(goodReplics>=ack) http.sendResponseHeaders(201, 0);
+        if (goodReplics >= ack) http.sendResponseHeaders(201, 0);
         else http.sendResponseHeaders(504, 0);
 
         http.close();
     }
 
     public void checkPut(@NotNull HttpExchange http, String id) throws IOException {
-        if(dao.containsDeletedKey(id)||dao.checkId(id)) simplePut(http, id);
+        if (dao.containsDeletedKey(id) || dao.checkId(id)) simplePut(http, id);
         else http.sendResponseHeaders(404, 0);
     }
 

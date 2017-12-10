@@ -19,11 +19,11 @@ public class MyFileDAO implements MyDAO {
     public MyFileDAO(@NotNull final File dir) {
 
         this.dir = dir;
-        this.deletedSet=new HashSet<>();
+        this.deletedSet = new HashSet<>();
     }
 
-    public boolean containsDeletedKey(@NotNull final String key){
-        if(deletedSet.contains(key)) return true;
+    public boolean containsDeletedKey(@NotNull final String key) {
+        if (deletedSet.contains(key)) return true;
         return false;
     }
 
@@ -54,18 +54,18 @@ public class MyFileDAO implements MyDAO {
 
         try (OutputStream os = new FileOutputStream(getFile(key))) {
             os.write(value);
-            removeOrAdd(key,true);
+            removeOrAdd(key, true);
         }
     }
 
     @Override
     public void delete(@NotNull final String key) throws IllegalArgumentException, IOException {
         getFile(key).delete();
-        removeOrAdd(key,false);
+        removeOrAdd(key, false);
     }
 
-    private void removeOrAdd(@NotNull final String key, boolean remove) throws IllegalArgumentException, IOException{
-        final File file=getFile("deleted");
+    private void removeOrAdd(@NotNull final String key, boolean remove) throws IllegalArgumentException, IOException {
+        final File file = getFile("deleted");
         file.createNewFile();
         if (!file.exists()) {
             throw new NoSuchElementException("File with key= " + key + " doesn't exist!");
@@ -76,19 +76,19 @@ public class MyFileDAO implements MyDAO {
         String strLine;
         HashSet<String> mySet = new HashSet<>();
 
-        while ((strLine = in.readLine()) != null){
+        while ((strLine = in.readLine()) != null) {
             mySet.add(strLine);
         }
 
-        if(!remove) mySet.add(key);
-        else if(mySet.contains(key)) mySet.remove(new String(key));
-        deletedSet=mySet;
+        if (!remove) mySet.add(key);
+        else if (mySet.contains(key)) mySet.remove(new String(key));
+        deletedSet = mySet;
         in.close();
 
         BufferedWriter out = new BufferedWriter(new FileWriter(file));
         Iterator it = mySet.iterator();
 
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             out.write((String) it.next());
             out.newLine();
         }
@@ -97,7 +97,7 @@ public class MyFileDAO implements MyDAO {
 
     public boolean checkId(@NotNull final String key) throws IllegalArgumentException, IOException {
         File file = new File(dir, key);
-        if( file.exists()) return true;
+        if (file.exists()) return true;
         return false;
     }
 
