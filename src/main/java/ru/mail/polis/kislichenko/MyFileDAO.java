@@ -102,20 +102,20 @@ public class MyFileDAO implements MyDAO {
     }
 
     private long getFreeMemory() {
-        return Runtime.getRuntime().maxMemory()
-                - (Runtime.getRuntime().totalMemory()
-                - Runtime.getRuntime().freeMemory());
+        return Runtime.getRuntime().maxMemory() -
+                (
+                        Runtime.getRuntime().totalMemory() -
+                                Runtime.getRuntime().freeMemory()
+                );
     }
 
     //сколько можно взять свободной памяти, чтобы не навредить работе программы (70%)
     private int getSizeFromFreeMemory(File file) {
-        if (file.length() > Integer.MAX_VALUE) {
-            if (file.length() < getFreeMemory() * 0.7) return Integer.MAX_VALUE;
-            return (int) (getFreeMemory() * 0.7);
-        } else {
-            if (file.length() < getFreeMemory() * 0.7) return (int) file.length();
-            return (int) (getFreeMemory() * 0.7);
+        if(file.length() < getFreeMemory() * 0.7) {
+            if (file.length() > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+            else if (file.length() < Integer.MAX_VALUE) return (int) file.length();
         }
+            return (int) (getFreeMemory() * 0.7);
     }
 
 }
