@@ -3,7 +3,6 @@ package ru.mail.polis;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.kislichenko.ClusterService;
 import ru.mail.polis.kislichenko.MyFileDAO;
-import ru.mail.polis.kislichenko.MyService;
 
 import java.io.File;
 import java.io.IOException;
