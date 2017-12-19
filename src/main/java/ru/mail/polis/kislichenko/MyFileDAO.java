@@ -14,6 +14,8 @@ public class MyFileDAO implements MyDAO {
     @NotNull
     private final File dir;
     @NotNull
+    private final File dirDeletedSet = new File("./deletedSet");
+    @NotNull
     private HashSet<String> deletedSet;
 
     public MyFileDAO(@NotNull final File dir) {
@@ -37,7 +39,7 @@ public class MyFileDAO implements MyDAO {
             throw new NoSuchElementException("File with key= " + key + " doesn't exist!");
         }
 
-        final int allowMemory=getSizeFromFreeMemory(file);
+        final int allowMemory = getSizeFromFreeMemory(file);
         //если размер файла меньше допустимой памяти
         if (file.length() < allowMemory) return Files.readAllBytes(Paths.get(dir.toString(), key));
             //если размер файла больше допустимой памяти, то берется первая часть
@@ -66,7 +68,8 @@ public class MyFileDAO implements MyDAO {
     }
 
     private void removeOrAdd(@NotNull final String key, boolean remove) throws IllegalArgumentException, IOException {
-        final File file = getFile("deleted");
+        if (!dirDeletedSet.isDirectory()) dirDeletedSet.mkdir();
+        final File file = new File(dirDeletedSet, key);
         file.createNewFile();
         if (!file.exists()) {
             throw new NoSuchElementException("File with key= " + key + " doesn't exist!");
