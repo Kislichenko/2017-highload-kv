@@ -37,10 +37,11 @@ public class MyFileDAO implements MyDAO {
             throw new NoSuchElementException("File with key= " + key + " doesn't exist!");
         }
 
+        final int allowMemory=getSizeFromFreeMemory(file);
         //если размер файла меньше допустимой памяти
-        if (file.length() < getSizeFromFreeMemory(file)) return Files.readAllBytes(Paths.get(dir.toString(), key));
+        if (file.length() < allowMemory) return Files.readAllBytes(Paths.get(dir.toString(), key));
             //если размер файла больше допустимой памяти, то берется первая часть
-        else return new StreamReading(new FileInputStream(file), getSizeFromFreeMemory(file)).getByteArray();
+        else return new StreamReading(new FileInputStream(file), allowMemory).getByteArray();
     }
 
     @NotNull

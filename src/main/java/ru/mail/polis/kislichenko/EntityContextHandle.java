@@ -57,8 +57,11 @@ public class EntityContextHandle {
 
         if (checkAckFrom(query)) {
             try {
-                ack = Integer.parseInt(extractAckFrom(query)[0]);
-                from = Integer.parseInt(extractAckFrom(query)[1]);
+
+                final String[] ackFrom = extractAckFrom(query);
+                ack = Integer.parseInt(ackFrom[0]);
+                from = Integer.parseInt(ackFrom[1]);
+
             } catch (NumberFormatException e) {
                 e.getStackTrace();
             }
