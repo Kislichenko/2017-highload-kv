@@ -10,7 +10,7 @@ public class EntityContextHandle {
     private static final String PREFIX = "id=";
     private static final String REPLICA_PREFIX = "&replicas=";
     private static final String CHECK_NODE_PUT = "&checkPut";
-
+    private final int sizeTopology;
     @NotNull
     private RequestPut myPut;
     @NotNull
@@ -18,13 +18,21 @@ public class EntityContextHandle {
     @NotNull
     private RequestDelete myDelete;
 
-    private final int sizeTopology;
-
     public EntityContextHandle(int port, @NotNull final MyFileDAO dao, int[] ports, String[] hosts) {
         this.myPut = new RequestPut(port, dao, ports, hosts);
         this.myGet = new RequestGet(port, dao, ports, hosts);
         this.myDelete = new RequestDelete(port, dao, ports, hosts);
         this.sizeTopology = ports.length;
+    }
+
+    @NotNull
+    private static String extractId(@NotNull final String query) {
+        if (!query.startsWith(PREFIX)) {
+            throw new IllegalArgumentException("Query without correct PREFIX!");
+        }
+        String[] fromID = query.substring(PREFIX.length()).split("&");
+        if (fromID[0].contains("/")) fromID[0] = fromID[0].substring(0, fromID[0].length() - 1);
+        return fromID[0];
     }
 
     public void entityContextHandle(@NotNull HttpExchange http) throws IOException {
@@ -86,6 +94,7 @@ public class EntityContextHandle {
         }
 
         http.close();
+
     }
 
     @NotNull
@@ -112,16 +121,6 @@ public class EntityContextHandle {
     private boolean checkNode(@NotNull final String query, @NotNull final String URLNode) {
         if (query.contains(URLNode)) return true;
         return false;
-    }
-
-    @NotNull
-    private static String extractId(@NotNull final String query) {
-        if (!query.startsWith(PREFIX)) {
-            throw new IllegalArgumentException("Query without correct PREFIX!");
-        }
-        String[] fromID = query.substring(PREFIX.length()).split("&");
-        if (fromID[0].contains("/")) fromID[0] = fromID[0].substring(0, fromID[0].length() - 1);
-        return fromID[0];
     }
 
     private void requestWithEmptyId(@NotNull HttpExchange http) throws IOException {

@@ -53,6 +53,6 @@ public class ClusterService implements KVService {
 
     @Override
     public void stop() {
-        this.server.stop(0);
+        server.stop(0);
     }
 }

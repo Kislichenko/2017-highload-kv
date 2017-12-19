@@ -9,12 +9,11 @@ import java.io.IOException;
 
 public class RequestPut {
 
-    private int[] ports;
-    private String[] hosts;
     private final int myPort;
-
     @NotNull
     private final MyFileDAO dao;
+    private int[] ports;
+    private String[] hosts;
 
     public RequestPut(int port, @NotNull final MyFileDAO dao, int[] ports, String[] hosts) {
 

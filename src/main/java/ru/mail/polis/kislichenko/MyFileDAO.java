@@ -95,7 +95,7 @@ public class MyFileDAO implements MyDAO {
         out.close();
     }
 
-    public boolean checkId(@NotNull final String key) throws IllegalArgumentException, IOException {
+    public boolean checkId(@NotNull final String key) throws IllegalArgumentException {
         File file = new File(dir, key);
         if (file.exists()) return true;
         return false;
@@ -111,11 +111,11 @@ public class MyFileDAO implements MyDAO {
 
     //сколько можно взять свободной памяти, чтобы не навредить работе программы (70%)
     private int getSizeFromFreeMemory(File file) {
-        if(file.length() < getFreeMemory() * 0.7) {
+        if (file.length() < getFreeMemory() * 0.7) {
             if (file.length() > Integer.MAX_VALUE) return Integer.MAX_VALUE;
             else if (file.length() < Integer.MAX_VALUE) return (int) file.length();
         }
-            return (int) (getFreeMemory() * 0.7);
+        return (int) (getFreeMemory() * 0.7);
     }
 
 }
