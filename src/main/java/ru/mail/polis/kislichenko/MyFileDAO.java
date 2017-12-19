@@ -71,19 +71,21 @@ public class MyFileDAO implements MyDAO {
             throw new NoSuchElementException("File with key= " + key + " doesn't exist!");
         }
 
-        FileInputStream fstream = new FileInputStream(file);
-        BufferedReader in = new BufferedReader(new InputStreamReader(fstream));
-        String strLine;
         HashSet<String> mySet = new HashSet<>();
+        try (BufferedReader in = new BufferedReader(new FileReader(file))) {
+            String strLine;
 
-        while ((strLine = in.readLine()) != null) {
-            mySet.add(strLine);
+            while ((strLine = in.readLine()) != null) {
+                mySet.add(strLine);
+            }
+
+            if (!remove) mySet.add(key);
+            else if (mySet.contains(key)) mySet.remove(key);
+            deletedSet = mySet;
+            in.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-
-        if (!remove) mySet.add(key);
-        else if (mySet.contains(key)) mySet.remove(new String(key));
-        deletedSet = mySet;
-        in.close();
 
         BufferedWriter out = new BufferedWriter(new FileWriter(file));
         Iterator it = mySet.iterator();
