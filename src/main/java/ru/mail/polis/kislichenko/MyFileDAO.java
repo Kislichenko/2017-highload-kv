@@ -69,7 +69,7 @@ public class MyFileDAO implements MyDAO {
 
     private void removeOrAdd(@NotNull final String key, boolean remove) throws IllegalArgumentException, IOException {
         if (!dirDeletedSet.isDirectory()) dirDeletedSet.mkdir();
-        final File file = new File(dirDeletedSet, key);
+        final File file = new File(dirDeletedSet, "deleted");
         file.createNewFile();
         if (!file.exists()) {
             throw new NoSuchElementException("File with key= " + key + " doesn't exist!");
@@ -93,10 +93,8 @@ public class MyFileDAO implements MyDAO {
         BufferedWriter out = new BufferedWriter(new FileWriter(file));
         Iterator it = mySet.iterator();
 
-        while (it.hasNext()) {
-            out.write((String) it.next());
-            out.newLine();
-        }
+        while (it.hasNext()) out.write(it.next() + "\n");
+
         out.close();
     }
 
@@ -116,11 +114,11 @@ public class MyFileDAO implements MyDAO {
 
     //сколько можно взять свободной памяти, чтобы не навредить работе программы (70%)
     private int getSizeFromFreeMemory(File file) {
-        if (file.length() < getFreeMemory() * 0.7) {
+        if (file.length() < getFreeMemory() * 0.35) {
             if (file.length() > Integer.MAX_VALUE) return Integer.MAX_VALUE;
             else if (file.length() < Integer.MAX_VALUE) return (int) file.length();
         }
-        return (int) (getFreeMemory() * 0.7);
+        return (int) (getFreeMemory() * 0.35);
     }
 
 }

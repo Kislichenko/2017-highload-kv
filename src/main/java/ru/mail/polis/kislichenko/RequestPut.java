@@ -31,12 +31,10 @@ public class RequestPut {
     }
 
     public void topologyPut(@NotNull HttpExchange http, String id, int ack, int from) throws IOException {
-        int code = 0;
         int goodReplics = 0;
-        byte[] myValue = {};
         final int contentLength = http.getRequestBody().available();
 
-        myValue = new StreamReading(http.getRequestBody(), contentLength).getByteArray();
+        byte[] myValue = new StreamReading(http.getRequestBody(), contentLength).getByteArray();
 
         int checkIdPut = -1;
 
@@ -52,13 +50,12 @@ public class RequestPut {
                 int tmpCode = Request.Put(URLCreating.urlNodesIdPut(ports[i], id)).execute().
                         returnResponse().getStatusLine().getStatusCode();
 
-                if (tmpCode == 404) continue;
-                else if (tmpCode == 201) {
+                if (tmpCode == 201) {
                     checkIdPut = i + 1;
                     break;
                 }
             } catch (IOException e) {
-                continue;
+                e.printStackTrace();
             }
         }
 
@@ -77,7 +74,7 @@ public class RequestPut {
             HttpResponse tmpStatus;
 
             try {
-                if (!checkGoods)tmpStatus = Request.Put(URLCreating.urlNodesIdInterior(ports[i], id))
+                if (!checkGoods) tmpStatus = Request.Put(URLCreating.urlNodesIdInterior(ports[i], id))
                         .bodyByteArray(myValue).execute().returnResponse();
                 else tmpStatus = Request.Put(URLCreating.urlNodesIdPut(ports[i], id))
                         .bodyByteArray(myValue).execute().returnResponse();
@@ -86,7 +83,7 @@ public class RequestPut {
                 continue;
             }
 
-            code = tmpStatus.getStatusLine().getStatusCode();
+            int code = tmpStatus.getStatusLine().getStatusCode();
 
             if (code == 201) goodReplics++;
         }

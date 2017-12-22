@@ -35,5 +35,4 @@ public class StreamReading {
             return out.toByteArray();
         }
     }
-
 }

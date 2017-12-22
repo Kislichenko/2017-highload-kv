@@ -13,6 +13,7 @@ public class URLCreating {
     public static String urlNodesIdInterior(final int port, @NotNull final String id) {
         return endpoint(port) + "/v0/entity?id=" + id + "/&interior";
     }
+
     @NotNull
     public static String endpoint(final int port) {
         return "http://localhost:" + port;

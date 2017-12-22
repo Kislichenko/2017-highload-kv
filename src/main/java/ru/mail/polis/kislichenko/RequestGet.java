@@ -92,8 +92,8 @@ public class RequestGet {
     }
 
     public void simpleGet(@NotNull HttpExchange http, String id) throws IOException {
-        if (dao.containsDeletedKey(id) && ports.length > 1) http.sendResponseHeaders(202, 0);
-        else if (dao.checkId(id) || ports.length == 1) {
+        if (dao.containsDeletedKey(id)) http.sendResponseHeaders(202, 0);
+        else if (dao.checkId(id)) {
             try {
                 final byte[] getValue = dao.get(id);
 

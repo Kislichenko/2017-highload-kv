@@ -7,13 +7,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-
 public class RequestDelete {
 
     private final int[] ports;
     private final String[] hosts;
     private final int myPort;
-
 
     @NotNull
     private final MyFileDAO dao;
@@ -27,7 +25,7 @@ public class RequestDelete {
     }
 
     public void simpleDelete(@NotNull HttpExchange http, String id) throws IOException {
-        if (dao.checkId(id) || ports.length == 1) {
+        if (dao.checkId(id)) {
             dao.delete(id);
             http.sendResponseHeaders(202, 0);
         } else http.sendResponseHeaders(404, 0);
@@ -42,7 +40,6 @@ public class RequestDelete {
                 goodReplics++;
                 continue;
             }
-            int code;
 
             HttpResponse tmpStatus;
             try {
@@ -50,9 +47,9 @@ public class RequestDelete {
             } catch (IOException e) {
                 continue;
             }
-            code = tmpStatus.getStatusLine().getStatusCode();
+            int code = tmpStatus.getStatusLine().getStatusCode();
 
-            if (code ==202||code==404) goodReplics++;
+            if (code == 202 || code == 404) goodReplics++;
         }
 
         if (goodReplics >= ack) http.sendResponseHeaders(202, 0);

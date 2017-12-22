@@ -107,7 +107,7 @@ public class EntityContextHandle {
     }
 
     private boolean checkAckFrom(@NotNull final String query) {
-        if (query.contains(REPLICA_PREFIX)) return true;
+        if (query.matches("\\S*" + REPLICA_PREFIX + "\\d*/\\d*")) return true;
         return false;
     }
 
