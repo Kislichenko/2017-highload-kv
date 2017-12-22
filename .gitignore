@@ -5,6 +5,10 @@
 !.gitignore
 !*.java
 
+# But not Lua and md files...
+!*.lua
+!*.md
+
 # And CI
 !.travis.yml
 !build.gradle.kts
