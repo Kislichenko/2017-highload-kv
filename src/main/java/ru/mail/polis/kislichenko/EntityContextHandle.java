@@ -9,6 +9,7 @@ public class EntityContextHandle {
 
     private static final String PREFIX = "id=";
     private static final String REPLICA_PREFIX = "&replicas=";
+    private static final String CHECK_NODE_INTERIOR = "&interior";
     private static final String CHECK_NODE_PUT = "&checkPut";
     private final int sizeTopology;
     @NotNull
@@ -52,8 +53,8 @@ public class EntityContextHandle {
             return;
         }
 
-        int ack = 0;
-        int from = 0;
+        int ack = sizeTopology / 2 + 1;
+        int from = sizeTopology;
 
         if (checkAckFrom(query)) {
             try {
@@ -75,19 +76,23 @@ public class EntityContextHandle {
 
         switch (http.getRequestMethod()) {
             case "GET":
-                if (checkNode(query, CHECK_NODE_PUT)) myPut.checkPut(http, id);
-                else if (!checkAckFrom(query)) myGet.simpleGet(http, id);
+                if (checkNode(query, CHECK_NODE_PUT)){
+                    System.out.println(CHECK_NODE_PUT);
+                    myPut.checkPut(http, id);
+                }
+                else if (checkNode(query, CHECK_NODE_INTERIOR)) myGet.simpleGet(http, id);
                 else myGet.topologyGet(http, id, ack, from);
 
                 break;
 
             case "DELETE":
-                if (!checkAckFrom(query)) myDelete.simpleDelete(http, id);
+                if (checkNode(query, CHECK_NODE_INTERIOR)) myDelete.simpleDelete(http, id);
                 else myDelete.topologyDelete(http, id, ack, from);
                 break;
 
             case "PUT":
-                if (!checkAckFrom(query)) myPut.simplePut(http, id);
+                if (checkNode(query, CHECK_NODE_PUT)) myPut.checkPut(http, id);
+                else if (checkNode(query, CHECK_NODE_INTERIOR)) myPut.simplePut(http, id);
                 else myPut.topologyPut(http, id, ack, from);
                 break;
 
@@ -102,18 +107,8 @@ public class EntityContextHandle {
 
     @NotNull
     private String[] extractAckFrom(@NotNull final String query) {
-
-        String[] ackFrom = new String[2];
-        try {
-            ackFrom = query.substring(query.lastIndexOf(REPLICA_PREFIX)
-                    + REPLICA_PREFIX.length()).split("/");
-        } catch (Exception e) {
-
-            ackFrom[0] = "" + (sizeTopology / 2 + 1);
-            ackFrom[1] = "" + sizeTopology;
-        }
-
-        return ackFrom;
+        return query.substring(query.lastIndexOf(REPLICA_PREFIX)
+                + REPLICA_PREFIX.length()).split("/");
     }
 
     private boolean checkAckFrom(@NotNull final String query) {
@@ -134,5 +129,6 @@ public class EntityContextHandle {
     private void requestDefault(@NotNull HttpExchange http, String id) throws IOException {
         http.sendResponseHeaders(405, 0);
     }
+
 
 }

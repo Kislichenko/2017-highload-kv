@@ -49,7 +49,7 @@ public class RequestPut {
                 continue;
             }
             try {
-                int tmpCode = Request.Get(URLCreating.urlNodesIdPut(ports[i], id)).execute().
+                int tmpCode = Request.Put(URLCreating.urlNodesIdPut(ports[i], id)).execute().
                         returnResponse().getStatusLine().getStatusCode();
 
                 if (tmpCode == 404) continue;
@@ -77,10 +77,17 @@ public class RequestPut {
             HttpResponse tmpStatus;
 
             try {
-                if (!checkGoods)
-                    tmpStatus = Request.Put(URLCreating.urlEntity(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
-                else
+                if (!checkGoods) {
+                    System.out.println("Ждем ответ1!!!");
+                    tmpStatus = Request.Put(URLCreating.urlNodesIdInterior(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
+                    System.out.println("Получили ответ1: " + tmpStatus.getStatusLine().getStatusCode());
+                }
+
+                else{
+                    System.out.println("Ждем ответ2!!!");
                     tmpStatus = Request.Put(URLCreating.urlNodesIdPut(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
+                    System.out.println("Получили ответ2: " + tmpStatus.getStatusLine().getStatusCode());
+                }
             } catch (IOException e) {
                 continue;
             }

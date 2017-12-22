@@ -60,7 +60,7 @@ public class RequestGet {
             final HttpResponse tmpStatus;
 
             try {
-                tmpStatus = Request.Get(URLCreating.urlEntity(ports[i], id)).execute().returnResponse();
+                tmpStatus = Request.Get(URLCreating.urlNodesIdInterior(ports[i], id)).execute().returnResponse();
             } catch (IOException e) {
                 continue;
             }
@@ -106,4 +106,5 @@ public class RequestGet {
             }
         } else http.sendResponseHeaders(504, 0);
     }
+
 }
