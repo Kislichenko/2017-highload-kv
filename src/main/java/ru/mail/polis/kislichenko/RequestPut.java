@@ -77,17 +77,11 @@ public class RequestPut {
             HttpResponse tmpStatus;
 
             try {
-                if (!checkGoods) {
-                    System.out.println("Ждем ответ1!!!");
-                    tmpStatus = Request.Put(URLCreating.urlNodesIdInterior(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
-                    System.out.println("Получили ответ1: " + tmpStatus.getStatusLine().getStatusCode());
-                }
+                if (!checkGoods)tmpStatus = Request.Put(URLCreating.urlNodesIdInterior(ports[i], id))
+                        .bodyByteArray(myValue).execute().returnResponse();
+                else tmpStatus = Request.Put(URLCreating.urlNodesIdPut(ports[i], id))
+                        .bodyByteArray(myValue).execute().returnResponse();
 
-                else{
-                    System.out.println("Ждем ответ2!!!");
-                    tmpStatus = Request.Put(URLCreating.urlNodesIdPut(ports[i], id)).bodyByteArray(myValue).execute().returnResponse();
-                    System.out.println("Получили ответ2: " + tmpStatus.getStatusLine().getStatusCode());
-                }
             } catch (IOException e) {
                 continue;
             }

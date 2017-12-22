@@ -79,12 +79,11 @@ public class MyFileDAO implements MyDAO {
         try (BufferedReader in = new BufferedReader(new FileReader(file))) {
             String strLine;
 
-            while ((strLine = in.readLine()) != null) {
-                mySet.add(strLine);
-            }
+            while ((strLine = in.readLine()) != null) mySet.add(strLine);
 
             if (!remove) mySet.add(key);
             else if (mySet.contains(key)) mySet.remove(key);
+
             deletedSet = mySet;
             in.close();
         } catch (IOException e) {

@@ -53,9 +53,8 @@ public class RequestDelete {
             code = tmpStatus.getStatusLine().getStatusCode();
 
             if (code ==202||code==404) goodReplics++;
-
         }
-        System.out.println("goodReplics: " + goodReplics);
+
         if (goodReplics >= ack) http.sendResponseHeaders(202, 0);
         else http.sendResponseHeaders(504, 0);
 

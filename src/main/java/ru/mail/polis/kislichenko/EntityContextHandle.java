@@ -76,11 +76,7 @@ public class EntityContextHandle {
 
         switch (http.getRequestMethod()) {
             case "GET":
-                if (checkNode(query, CHECK_NODE_PUT)){
-                    System.out.println(CHECK_NODE_PUT);
-                    myPut.checkPut(http, id);
-                }
-                else if (checkNode(query, CHECK_NODE_INTERIOR)) myGet.simpleGet(http, id);
+                if (checkNode(query, CHECK_NODE_INTERIOR)) myGet.simpleGet(http, id);
                 else myGet.topologyGet(http, id, ack, from);
 
                 break;
@@ -102,7 +98,6 @@ public class EntityContextHandle {
         }
 
         http.close();
-
     }
 
     @NotNull

@@ -74,7 +74,6 @@ public class RequestGet {
                 getValue = byteArrayOutputStream.toByteArray();
             }
 
-
             if (code == 200 && getValue.length > 0) goodReplics++;
             else if (code == 202) ansDeleted++;
             else if (code == 404) replicsWithoutData++;
