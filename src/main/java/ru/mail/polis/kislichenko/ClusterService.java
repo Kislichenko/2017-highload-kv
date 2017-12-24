@@ -1,6 +1,5 @@
 package ru.mail.polis.kislichenko;
 
-import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVService;
@@ -8,6 +7,8 @@ import ru.mail.polis.KVService;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClusterService implements KVService {
 
@@ -21,29 +22,35 @@ public class ClusterService implements KVService {
     private final String[] hosts;
     @NotNull
     private final int myPort;
+    @NotNull
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     public ClusterService(int port, @NotNull final MyFileDAO dao, @NotNull final Set<String> topology) throws IOException {
 
         this.server = HttpServer.create(new InetSocketAddress(port), 0);
         this.dao = dao;
 
-        this.server.createContext("/v0/status", this::statusContextHandle);
-        this.server.createContext("/v0/entity", this::entityContextHandle);
-
         this.ports = URLReader.getPorts(topology);
         this.hosts = URLReader.getHosts(topology);
 
         this.myPort = port;
-    }
 
-    private void entityContextHandle(@NotNull HttpExchange http) throws IOException {
-        EntityContextHandle entityContext = new EntityContextHandle(myPort, dao, ports, hosts);
-        entityContext.entityContextHandle(http);
-    }
+        this.server.createContext("/v0/status", http -> executor.execute(() -> {
+            try {
+                new StatusContextHandle().contextStatus(http);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
 
-    private void statusContextHandle(HttpExchange http) throws IOException {
-        StatusContextHandle statusContext = new StatusContextHandle();
-        statusContext.contextStatus(http);
+        this.server.createContext("/v0/entity", http -> executor.execute(() -> {
+            try {
+                new EntityContextHandle(myPort, dao, ports, hosts).entityContextHandle(http);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     @Override

@@ -34,12 +34,12 @@ public class RequestDelete {
     public void topologyDelete(@NotNull HttpExchange http, String id, int ack, int from) throws IOException {
         int goodReplics = 0;
 
+        if (dao.checkId(id)) dao.delete(id);
+        goodReplics++;
+
         for (int i = 0; goodReplics < from && i < hosts.length; i++) {
-            if (ports[i] == myPort) {
-                if (dao.checkId(id)) dao.delete(id);
-                goodReplics++;
-                continue;
-            }
+            if (ports[i] == myPort) continue;
+
 
             HttpResponse tmpStatus;
             try {

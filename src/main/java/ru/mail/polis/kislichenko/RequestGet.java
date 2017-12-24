@@ -34,28 +34,25 @@ public class RequestGet {
         byte[] getValue = {};
         int ansDeleted = 0;
 
+        if (dao.checkId(id) || dao.containsDeletedKey(id)) {
+
+            try {
+
+                if (!dao.containsDeletedKey(id)) {
+
+                    if (dao.get(id).length > getValue.length) getValue = dao.get(id);
+                    if (dao.get(id).length == 0) replicsWithoutData++;
+                    goodReplics++;
+                } else ansDeleted++;
+
+            } catch (NoSuchElementException ignored) {
+
+            }
+        } else replicsWithoutData++;
+
         for (int i = 0; goodReplics + replicsWithoutData < from && i < hosts.length; i++) {
 
-
-            if (ports[i] == myPort) {
-
-                if (dao.checkId(id) || dao.containsDeletedKey(id)) {
-
-                    try {
-
-                        if (!dao.containsDeletedKey(id)) {
-
-                            if (dao.get(id).length > getValue.length) getValue = dao.get(id);
-                            if (dao.get(id).length == 0) replicsWithoutData++;
-                            goodReplics++;
-                        } else ansDeleted++;
-
-                    } catch (NoSuchElementException e) {
-                        continue;
-                    }
-                } else replicsWithoutData++;
-                continue;
-            }
+            if (ports[i] == myPort) continue;
 
             final HttpResponse tmpStatus;
 

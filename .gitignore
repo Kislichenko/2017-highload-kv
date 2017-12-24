@@ -5,9 +5,10 @@
 !.gitignore
 !*.java
 
-# But not Lua and md files...
+# But not Lua, md and png files...
 !*.lua
 !*.md
+!*.png
 
 # And CI
 !.travis.yml

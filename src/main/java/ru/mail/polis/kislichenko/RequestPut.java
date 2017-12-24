@@ -64,13 +64,13 @@ public class RequestPut {
         if (checkIdPut == -1) checkIdPut = 0;
         else checkGoods = true;
 
+        if (dao.containsDeletedKey(id) || dao.checkId(id) || !checkGoods) dao.upsert(id, myValue);
+        goodReplics++;
+
         for (int i = checkIdPut; goodReplics < from && i < hosts.length; i++) {
 
-            if (ports[i] == myPort) {
-                if (dao.containsDeletedKey(id) || dao.checkId(id) || !checkGoods) dao.upsert(id, myValue);
-                goodReplics++;
-                continue;
-            }
+            if (ports[i] == myPort) continue;
+
             HttpResponse tmpStatus;
 
             try {

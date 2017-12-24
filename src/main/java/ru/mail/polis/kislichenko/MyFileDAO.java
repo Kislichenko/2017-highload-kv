@@ -40,6 +40,9 @@ public class MyFileDAO implements MyDAO {
         }
 
         final int allowMemory = getSizeFromFreeMemory(file);
+
+        //чтение файла через отображение
+        //return new Streaming(file.length()).getByteArray(file);
         //если размер файла меньше допустимой памяти
         if (file.length() < allowMemory) return Files.readAllBytes(Paths.get(dir.toString(), key));
             //если размер файла больше допустимой памяти, то берется первая часть
@@ -47,7 +50,7 @@ public class MyFileDAO implements MyDAO {
     }
 
     @NotNull
-    private File getFile(@NotNull final String key) throws IOException {
+    private File getFile(@NotNull final String key) {
         return new File(dir, key);
     }
 
